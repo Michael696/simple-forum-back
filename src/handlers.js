@@ -8,9 +8,14 @@ function auth(req, res) {
 }
 
 function register(req, res) {
-    console.log('register:', req.body);
+    const {body} = req;
+    console.log('register:', body);
     setTimeout(() => {
-        res.status(200).json({name: 'testName', id: '01'});
+        if (body.name === 'a') {
+            res.status(200).json({name: 'testName', id: '01'});
+        } else {
+            res.status(500).json({error: 'some error'});
+        }
     }, 2000);
 }
 
