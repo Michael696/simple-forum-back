@@ -49,6 +49,7 @@ app.post('/api/register', handlers.register);
 app.post('/api/online-users', handlers.onlineUsers);
 app.post('/api/forum-list', handlers.forumList);
 app.post('/api/threads', handlers.forumThreads);
+app.post('/api/posts', handlers.forumPosts);
 
 
 let server = app.listen(1337, function () {
