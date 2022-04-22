@@ -4,7 +4,8 @@ const loggerHttp = require('morgan');
 const bodyParser = require('body-parser');
 const cors = require('cors');
 const session = require('express-session');
-const FileStore = require('session-file-store')(session);
+// const FileStore = require('session-file-store')(session);
+const MemoryStore = require('memorystore')(session);
 const app = express();
 const handlers = require('./src/handlers');
 
@@ -43,6 +44,17 @@ app.use(cors({
 }));
 
 app.use(bodyParser.json());
+
+app.use(session({
+    cookie: {maxAge: 86400000},
+    store: new MemoryStore({
+        checkPeriod: 86400000 // prune expired entries every 24h
+    }),
+    resave: true,
+    rolling: true,
+    secret: 'secret',
+    saveUninitialized: false,
+}));
 
 app.post('/api/auth', handlers.auth);
 app.post('/api/register', handlers.register);

@@ -1,7 +1,11 @@
+const {Auth} = require('./auth');
+
 function auth(req, res) {
     console.log('auth:', req.body);
-    if (req.body.username === 'test') {
-        res.status(200).json({name: 'testName', id: '01'});
+    const {name: username, password} = req.body;
+    const id = Auth.auth(req.session, {username, password});
+    if (id) {
+        res.status(200).json({name: username, id});
     } else {
         res.status(401).json({error: true});
     }
@@ -51,7 +55,7 @@ const USERS = [
     }, {
         id: '03', name: 'user3', registeredAt: '2002-01-01', posts: 777, location: 'bath', isBanned: false
     }, {
-        id: '04', name: 'user4', registeredAt: '2003-01-01', posts: 666, location: 'kitchen', isBanned: false
+        id: '04', name: 'user4', registeredAt: '2003-01-01', posts: 666, location: 'kitchen', isBanned: true
     }
 ];
 
@@ -205,7 +209,7 @@ function forumPosts(req, res) {
                 't01': [
                     {
                         id: 'p01',
-                        author: {id: '03', name: 'user3', isBanned: false, isAdmin: true},
+                        author: USERS[2],
                         title: 'post 1 title',
                         text: 'post 1 long text',
                         likes: 1,
@@ -216,7 +220,7 @@ function forumPosts(req, res) {
                     },
                     {
                         id: 'p02',
-                        author: {id: '02', name: 'user2', isBanned: false},
+                        author: USERS[1],
                         title: 'post 2 title',
                         text: 'post 2 long text',
                         likes: 3,
@@ -229,9 +233,9 @@ function forumPosts(req, res) {
                 't02': [
                     {
                         id: 'p03',
-                        author: {id: '02', name: 'user2', isBanned: false, isAdmin: true},
+                        author: USERS[0],
                         title: 'post 3 title',
-                        text: 'post 3 long text',
+                        text: 'post 3 long text post 3 long text post 3 long text post 3 long text post 3 long text post 3 long text post 3 long text post 3 long text post 3 long text post 3 long text post 3 long text post 3 long text post 3 long text post 3 long text post 3 long text post 3 long text ',
                         likes: 31,
                         dislikes: 32,
                         isLiked: false,
@@ -240,7 +244,7 @@ function forumPosts(req, res) {
                     },
                     {
                         id: 'p04',
-                        author: {id: '03', name: 'user3', isBanned: false},
+                        author: USERS[3],
                         title: 'post 2 title',
                         text: 'post 2 long text',
                         likes: 3,
