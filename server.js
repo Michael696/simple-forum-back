@@ -57,6 +57,7 @@ app.use(session({
 }));
 
 app.post('/api/auth', handlers.auth);
+app.post('/api/deauth', handlers.deauth);
 app.post('/api/register', handlers.register);
 app.post('/api/online-users', handlers.onlineUsers);
 app.post('/api/forum-list', handlers.forumList);

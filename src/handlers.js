@@ -11,6 +11,12 @@ function auth(req, res) {
     }
 }
 
+function deauth(req, res) {
+    console.log('deauth:', req.body);
+    Auth.clear(req.session);
+    res.status(200).end();
+}
+
 function register(req, res) {
     const {body} = req;
     console.log('register:', body);
@@ -264,4 +270,4 @@ function forumPosts(req, res) {
 }
 
 
-module.exports = {auth, register, onlineUsers, forumList, forumThreads, forumPosts};
+module.exports = {auth, deauth, register, onlineUsers, forumList, forumThreads, forumPosts};
