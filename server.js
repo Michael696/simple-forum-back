@@ -46,7 +46,7 @@ app.use(cors({
 app.use(bodyParser.json());
 
 app.use(session({
-    cookie: {maxAge: 86400000},
+    cookie: {httpOnly: false, maxAge: 86400000},
     store: new MemoryStore({
         checkPeriod: 86400000 // prune expired entries every 24h
     }),
@@ -63,6 +63,7 @@ app.post('/api/online-users', handlers.onlineUsers);
 app.post('/api/forum-list', handlers.forumList);
 app.post('/api/threads', handlers.forumThreads);
 app.post('/api/posts', handlers.forumPosts);
+app.post('/api/add-threadViewCount', handlers.addThreadViewCount);
 
 
 let server = app.listen(1337, function () {
