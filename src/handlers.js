@@ -4,12 +4,11 @@ const {Storage} = require('./storage');
 const storage = new Storage();
 
 function auth(req, res) {
-    console.log('auth:', req.body);
+    console.log('auth body:', req.body);
     const {name: username, password} = req.body;
     const id = Auth.auth(req.session, {username, password});
     if (id) {
-        const user = USERS.find(u => u.id === id);
-        console.log('user:', user);
+        const user = storage.getUser(username);
         if (user) {
             res.status(200).json(user);
         } else {
@@ -26,18 +25,14 @@ function deauth(req, res) {
     res.status(200).end();
 }
 
-/*
 function checkAuth(req, res, next) {
-    if(req.session) {
-        if (Auth.check(req.session)) {
-           next();
-        } else {
-            res.
-        }
+    console.log(req);
+    if (Auth.check(req.session)) {
+        next();
+    } else {
+        res.status(401).end();
     }
-    next();
 }
-*/
 
 function register(req, res) {
     const {body} = req;
@@ -107,14 +102,19 @@ function addThreadViewCount(req, res) {
     }
 }
 
+function newThread(req, res) {
+
+}
+
 module.exports = {
     auth,
     deauth,
-    /*checkAuth,*/
+    checkAuth,
     register,
     onlineUsers,
     forumList,
     forumThreads,
     forumPosts,
-    addThreadViewCount
+    addThreadViewCount,
+    newThread
 };

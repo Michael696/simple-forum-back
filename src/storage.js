@@ -19,7 +19,7 @@ class Storage {
         this.users = [
             {
                 id: '01',
-                name: 'user1',
+                name: 'a',
                 realName: ' user1 real name',
                 registeredAt: '2000-01-01',
                 eMail: 'mailA@mail.su',
@@ -238,6 +238,10 @@ class Storage {
 
     registerUser(username, password, eMail) {
 
+    }
+
+    getUser(name) {
+        return this.users.find(user => user.name === name);
     }
 
     getThreads(forumId) {

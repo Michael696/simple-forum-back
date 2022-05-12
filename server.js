@@ -35,26 +35,51 @@ app.use(loggerHttp(':remote-addr :method :url :status :response-time ms len=:req
 ));
 */
 
-app.use(cors({
-    origin: ['http://127.0.0.1:3000', 'http://localhost:3000'],
-    methods: ['OPTIONS', 'POST'],
-    allowedHeaders: ['Access-Control-Allow-Headers', 'Access-Control-Allow-Origin', 'Origin', 'Accept', 'X-Requested-With', 'Content-Type',
-        'Access-Control-Request-Method', 'Access-Control-Request-Headers', 'Authorization'],
-    credentials: true
-}));
 
 app.use(bodyParser.json());
 
 app.use(session({
-    cookie: {httpOnly: false, maxAge: 86400000},
+    secret: 'secret',
+    name: 'session',
+    cookie: {
+        httpOnly: false,
+        secure: false,
+        maxAge: 86400000,
+        sameSite: 'None',
+    },
     store: new MemoryStore({
         checkPeriod: 86400000 // prune expired entries every 24h
     }),
-    resave: true,
     rolling: true,
-    secret: 'secret',
-    saveUninitialized: false,
+    resave: false, // don't save session if unmodified
+    saveUninitialized: false, // don't create session until something stored
 }));
+
+app.use(cors({
+    origin: ['http://127.0.0.1:3000', 'http://localhost:3000'],
+    methods: ['OPTIONS', 'POST'],
+    allowedHeaders: [
+        'Access-Control-Allow-Headers',
+        'Access-Control-Allow-Origin',
+        'Access-Control-Allow-Credentials',
+        'Access-Control-Request-Method',
+        'Access-Control-Request-Headers',
+        'Origin',
+        'Content-Type',
+        // 'Accept',
+        // 'X-Requested-With',
+        // 'Authorization',
+    ],
+    credentials: true
+}));
+
+app.use((req, res, next) => {
+    console.log('middle', Object.keys(req));
+    if (req.session) {
+        console.log('session:', req.session);
+    }
+    next();
+});
 
 app.post('/api/auth', handlers.auth);
 app.post('/api/deauth', handlers.deauth);
@@ -64,6 +89,7 @@ app.post('/api/forum-list', handlers.forumList);
 app.post('/api/threads', handlers.forumThreads);
 app.post('/api/posts', handlers.forumPosts);
 app.post('/api/add-threadViewCount', handlers.addThreadViewCount);
+app.post('/api/new-thread', [handlers.checkAuth, handlers.newThread]);
 
 
 let server = app.listen(1337, function () {
