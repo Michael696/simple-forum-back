@@ -82,6 +82,7 @@ app.use((req, res, next) => {
 });
 
 app.post('/api/auth', handlers.auth);
+app.post('/api/current-user', handlers.currentUser);
 app.post('/api/deauth', handlers.deauth);
 app.post('/api/register', handlers.register);
 app.post('/api/online-users', handlers.onlineUsers);

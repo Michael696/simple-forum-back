@@ -19,6 +19,20 @@ function auth(req, res) {
     }
 }
 
+function currentUser(req, res) {
+    console.log('currentUser:', req.body);
+    if (req.session && req.session.username) {
+        const user = storage.getUser(req.session.username);
+        if (user) {
+            res.status(200).json(user);
+        } else {
+            res.status(401).json({error: 'user not found'});
+        }
+    } else {
+        res.status(401).json({error: 'invalid session'});
+    }
+}
+
 function deauth(req, res) {
     console.log('deauth:', req.body);
     Auth.clear(req.session);
@@ -108,6 +122,7 @@ function newThread(req, res) {
 
 module.exports = {
     auth,
+    currentUser,
     deauth,
     checkAuth,
     register,
@@ -116,5 +131,5 @@ module.exports = {
     forumThreads,
     forumPosts,
     addThreadViewCount,
-    newThread
+    newThread,
 };
