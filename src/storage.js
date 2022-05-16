@@ -12,6 +12,36 @@ function getUserTemplate() {
     }
 }
 
+function getThreadTemplate() {
+    return {
+        id: '',
+        forumId: '',
+        author: {},
+        title: '',
+        postCount: 0,
+        viewCount: 0,
+        likes: [],
+        dislikes: [],
+        lastMessage: {
+            dateTime: '', user: {}
+        }
+    }
+}
+
+function getPostTemplate() {
+    return {
+        id: '',
+        threadId: '',
+        forumId: '',
+        author: {},
+        title: '',
+        text: '',
+        likes: [],
+        dislikes: [],
+        postedAt: '',
+        editedAt: '',
+    }
+}
 
 class Storage {
 
@@ -189,7 +219,6 @@ class Storage {
                 text: 'post 1 long text',
                 likes: [this.users[1]],
                 dislikes: [],
-                isLiked: false,
                 postedAt: '2022-04-05T13:19:13',
                 editedAt: '2022-04-05T13:19:15',
             },
@@ -202,7 +231,6 @@ class Storage {
                 text: 'post 2 long text',
                 likes: [],
                 dislikes: [],
-                isLiked: false,
                 postedAt: '2022-04-05T14:19:13',
                 editedAt: '2022-04-05T15:19:15',
             },
@@ -215,7 +243,6 @@ class Storage {
                 text: 'post 3 long text post 3 long text post 3 long text post 3 long text post 3 long text post 3 long text post 3 long text post 3 long text post 3 long text post 3 long text post 3 long text post 3 long text post 3 long text post 3 long text post 3 long text post 3 long text ',
                 likes: [],
                 dislikes: [],
-                isLiked: false,
                 postedAt: '2022-04-05T13:19:13',
                 editedAt: '2022-04-05T13:19:15',
             },
@@ -228,7 +255,6 @@ class Storage {
                 text: 'post 2 long text',
                 likes: [],
                 dislikes: [],
-                isLiked: false,
                 postedAt: '2022-04-05T14:19:13',
                 editedAt: '2022-04-05T15:19:15',
             }
@@ -257,12 +283,48 @@ class Storage {
     }
 
     addPost(post) {
-        this.posts.push(post); // no checks!!!
-
+        const author = this.users.find(user => user.id === post.author);
+        if (!author.isBanned) {
+            const postTemplate = getPostTemplate();
+            const postedAt = new Date().toISOString();
+            this.nextPostId++;
+            const postData = {
+                ...postTemplate,
+                ...post,
+                author,
+                id: this.nextPostId.toString(),
+                postedAt
+            };
+            console.log('creating post:', postData);
+            this.posts.push(postData);
+            const thread = this.threads.find(thread => thread.id === post.threadId);
+            if (thread) {
+                thread.postCount++;
+                thread.lastMessage = {
+                    dateTime: postedAt,
+                    user: author
+                }
+            }
+            return this.nextPostId;
+        }
+        return false;
     }
 
     addThread(thread) {
-        this.threads.push(thread); // no checks!!!
+        const threadTemplate = getThreadTemplate();
+        const author = this.users.find(user => user.id === thread.author);
+        if (!author.isBanned) {
+            this.nextThreadId++;
+            const threadData = {
+                ...threadTemplate,
+                ...thread,
+                author,
+                id: this.nextThreadId.toString()
+            };
+            this.threads.push(threadData);
+            return this.nextThreadId;
+        }
+        return false;
     }
 
     addThreadViewCount(threadId) {

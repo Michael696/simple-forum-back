@@ -21,7 +21,7 @@ class Auth extends Object {
     }
 
     static check(session) {
-        return session && session.username.length > 0;
+        return session && session.username && session.username.length > 0;
     }
 
     static clear(session) {

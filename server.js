@@ -73,13 +73,15 @@ app.use(cors({
     credentials: true
 }));
 
+/*
 app.use((req, res, next) => {
-    console.log('middle', Object.keys(req));
+    // console.log('middle', Object.keys(req));
     if (req.session) {
         console.log('session:', req.session);
     }
     next();
 });
+*/
 
 app.post('/api/auth', handlers.auth);
 app.post('/api/current-user', handlers.currentUser);
@@ -90,8 +92,8 @@ app.post('/api/forum-list', handlers.forumList);
 app.post('/api/threads', handlers.forumThreads);
 app.post('/api/posts', handlers.forumPosts);
 app.post('/api/add-threadViewCount', handlers.addThreadViewCount);
-app.post('/api/new-thread', [handlers.checkAuth, handlers.newThread]);
-
+app.post('/api/create-thread', [handlers.checkAuth, handlers.createThread]);
+app.post('/api/create-post', [handlers.checkAuth, handlers.createPost]);
 
 let server = app.listen(1337, function () {
     let msg = `Express server is listening on ${JSON.stringify(server.address())}`;

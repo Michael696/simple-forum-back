@@ -116,8 +116,30 @@ function addThreadViewCount(req, res) {
     }
 }
 
-function newThread(req, res) {
+function createThread(req, res) {
+    if (req.session && req.session.username) {
+        const id = storage.addThread(req.body);
+        if (id) {
+            res.status(200).json({id});
+        } else {
+            res.status(403).json({error: 'you are banned'});
+        }
+    } else {
+        res.status(401).json({error: 'unauthorized'});
+    }
+}
 
+function createPost(req, res) {
+    if (req.session && req.session.username) {
+        const id = storage.addPost(req.body);
+        if (id) {
+            res.status(200).json({id});
+        } else {
+            res.status(403).json({error: 'you are banned'});
+        }
+    } else {
+        res.status(401).json({error: 'unauthorized'});
+    }
 }
 
 module.exports = {
@@ -131,5 +153,6 @@ module.exports = {
     forumThreads,
     forumPosts,
     addThreadViewCount,
-    newThread,
+    createThread,
+    createPost
 };
