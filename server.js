@@ -94,6 +94,8 @@ app.post('/api/posts', handlers.forumPosts);
 app.post('/api/add-threadViewCount', handlers.addThreadViewCount);
 app.post('/api/create-thread', [handlers.checkAuth, handlers.createThread]);
 app.post('/api/create-post', [handlers.checkAuth, handlers.createPost]);
+app.post('/api/ban-user', [handlers.checkAuth, handlers.banUser]);
+app.post('/api/unban-user', [handlers.checkAuth, handlers.unbanUser]);
 
 let server = app.listen(1337, function () {
     let msg = `Express server is listening on ${JSON.stringify(server.address())}`;

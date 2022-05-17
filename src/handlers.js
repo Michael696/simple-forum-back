@@ -10,7 +10,7 @@ function auth(req, res) {
     if (id) {
         const user = storage.getUserByName(username);
         if (user) {
-            storage.addOnlineUser(id);
+            storage.addOnlineUser(user.id);
             res.status(200).json(user);
         } else {
             res.status(401).json({error: 'user not found'});
@@ -148,6 +148,36 @@ function createPost(req, res) {
     }
 }
 
+function banUser(req, res) {
+    if (req.session && req.session.username && req.body.id) {
+        const user = storage.getUserByName(req.session.username);
+        if (user.isAdmin) {
+            storage.banUser(req.body.id);
+            console.log('banned user:', user);
+            res.status(200).json({});
+        } else {
+            res.status(403).json({error: 'you are not an admin'});
+        }
+    } else {
+        res.status(401).json({error: 'unauthorized'});
+    }
+}
+
+function unbanUser(req, res) {
+    if (req.session && req.session.username && req.body.id) {
+        const user = storage.getUserByName(req.session.username);
+        if (user.isAdmin) {
+            storage.unbanUser(req.body.id);
+            console.log('unbanned user:', user);
+            res.status(200).json({});
+        } else {
+            res.status(403).json({error: 'you are not an admin'});
+        }
+    } else {
+        res.status(401).json({error: 'unauthorized'});
+    }
+}
+
 module.exports = {
     auth,
     currentUser,
@@ -160,5 +190,7 @@ module.exports = {
     forumPosts,
     addThreadViewCount,
     createThread,
-    createPost
+    createPost,
+    banUser,
+    unbanUser,
 };
