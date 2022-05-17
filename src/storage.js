@@ -46,6 +46,7 @@ function getPostTemplate() {
 class Storage {
 
     constructor() {
+        this.onlineUsers = [];
         this.users = [
             {
                 id: '01',
@@ -266,7 +267,7 @@ class Storage {
 
     }
 
-    getUser(name) {
+    getUserByName(name) {
         return this.users.find(user => user.name === name);
     }
 
@@ -280,6 +281,23 @@ class Storage {
 
     getPosts(threadId) {
         return this.posts.filter(post => post.threadId === threadId);
+    }
+
+    getOnlineUsers() {
+        return this.onlineUsers;
+    }
+
+    addOnlineUser(id) {
+        if (!this.onlineUsers.some(user => user.id === id)) {
+            const user = this.users.find(user => user.id === id);
+            if (user) {
+                this.onlineUsers.push(user);
+            }
+        }
+    }
+
+    removeOnlineUser(id) {
+        this.onlineUsers = this.onlineUsers.filter(user => user.id !== id);
     }
 
     addPost(post) {

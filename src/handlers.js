@@ -8,8 +8,9 @@ function auth(req, res) {
     const {name: username, password} = req.body;
     const id = Auth.auth(req.session, {username, password});
     if (id) {
-        const user = storage.getUser(username);
+        const user = storage.getUserByName(username);
         if (user) {
+            storage.addOnlineUser(id);
             res.status(200).json(user);
         } else {
             res.status(401).json({error: 'user not found'});
@@ -22,7 +23,7 @@ function auth(req, res) {
 function currentUser(req, res) {
     console.log('currentUser:', req.body);
     if (req.session && req.session.username) {
-        const user = storage.getUser(req.session.username);
+        const user = storage.getUserByName(req.session.username);
         if (user) {
             res.status(200).json(user);
         } else {
@@ -35,6 +36,10 @@ function currentUser(req, res) {
 
 function deauth(req, res) {
     console.log('deauth:', req.body);
+    const user = storage.getUserByName(req.session.username);
+    if (user) {
+        storage.removeOnlineUser(user.id);
+    }
     Auth.clear(req.session);
     res.status(200).end();
 }
@@ -73,8 +78,9 @@ function register(req, res) {
 
 function onlineUsers(req, res) {
     setTimeout(() => {
+        const online = storage.getOnlineUsers().map(user => user.name);
         // console.log('online');
-        res.status(200).json(['user1', 'user2', 'user3', 'user4'])
+        res.status(200).json(online)
     }, 500);
 }
 
