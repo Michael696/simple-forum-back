@@ -161,6 +161,18 @@ function setPostText(req, res) {
     }
 }
 
+function removePost(req, res) {
+    if (req.session && req.session.username) {
+        const result = storage.removePost(req.body);
+        if (result) {
+            res.status(200).json({});
+        } else {
+            res.status(403).json({error: 'you are banned'});
+        }
+    } else {
+        res.status(401).json({error: 'unauthorized'});
+    }
+}
 
 function banUser(req, res) {
     if (req.session && req.session.username && req.body.id) {
@@ -208,4 +220,5 @@ module.exports = {
     banUser,
     unbanUser,
     setPostText,
+    removePost,
 };

@@ -43,6 +43,8 @@ function getPostTemplate() {
     }
 }
 
+//TODO recalculate various quantities(posts, views, etc) on add/remove operations
+
 class Storage {
 
     constructor() {
@@ -350,6 +352,11 @@ class Storage {
             return true;
         }
         return false;
+    }
+
+    removePost({id}) { // TODO set the "removed" flag, do not actually remove
+        this.posts = this.posts.filter(post => post.id !== id);
+        return true;
     }
 
     addThread(thread) {
