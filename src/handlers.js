@@ -96,7 +96,7 @@ function forumThreads(req, res) {
     if (id) {
         setTimeout(() => {
             res.status(200).json(storage.getThreads(id));
-        }, 1000);
+        }, 1500);
     } else {
         res.status(400).end(`no such forumId ${id}`);
     }
@@ -107,7 +107,7 @@ function forumPosts(req, res) {
     if (id) {
         setTimeout(() => {
             res.status(200).json(storage.getPosts(id));
-        }, 500);
+        }, 1500);
     } else {
         res.status(400).end(`no such threadId ${id}`);
     }
@@ -147,6 +147,20 @@ function createPost(req, res) {
         res.status(401).json({error: 'unauthorized'});
     }
 }
+
+function setPostText(req, res) {
+    if (req.session && req.session.username) {
+        const result = storage.setPostText(req.body);
+        if (result) {
+            res.status(200).json({});
+        } else {
+            res.status(403).json({error: 'you are banned'});
+        }
+    } else {
+        res.status(401).json({error: 'unauthorized'});
+    }
+}
+
 
 function banUser(req, res) {
     if (req.session && req.session.username && req.body.id) {
@@ -193,4 +207,5 @@ module.exports = {
     createPost,
     banUser,
     unbanUser,
+    setPostText,
 };

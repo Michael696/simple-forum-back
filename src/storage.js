@@ -343,6 +343,15 @@ class Storage {
         return false;
     }
 
+    setPostText({id, text}) {
+        const post = this.posts.find(post => post.id === id);
+        if (post) {
+            post.text = text;
+            return true;
+        }
+        return false;
+    }
+
     addThread(thread) {
         const threadTemplate = getThreadTemplate();
         const author = this.users.find(user => user.id === thread.author);

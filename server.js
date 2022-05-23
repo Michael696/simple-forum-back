@@ -94,6 +94,7 @@ app.post('/api/posts', handlers.forumPosts);
 app.post('/api/add-threadViewCount', handlers.addThreadViewCount);
 app.post('/api/create-thread', [handlers.checkAuth, handlers.createThread]);
 app.post('/api/create-post', [handlers.checkAuth, handlers.createPost]);
+app.post('/api/set-post-text', [handlers.checkAuth, handlers.setPostText]);
 app.post('/api/ban-user', [handlers.checkAuth, handlers.banUser]);
 app.post('/api/unban-user', [handlers.checkAuth, handlers.unbanUser]);
 
