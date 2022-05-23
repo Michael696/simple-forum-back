@@ -43,7 +43,8 @@ function getPostTemplate() {
     }
 }
 
-//TODO recalculate various quantities(posts, views, etc) on add/remove operations
+// TODO recalculate various quantities(posts, views, etc) on add/remove operations
+// TODO add authorization checks for add/remove/modify operations
 
 class Storage {
 
@@ -57,7 +58,7 @@ class Storage {
                 registeredAt: '2000-01-01',
                 eMail: 'mailA@mail.su',
                 posts: 9999,
-                location: 'chair',
+                location: 'moscow',
                 isBanned: false,
                 isAdmin: true
             }, {
@@ -67,7 +68,7 @@ class Storage {
                 registeredAt: '2001-01-01',
                 eMail: 'mailB@mail.su',
                 posts: 888,
-                location: 'home',
+                location: 'peter',
                 isBanned: false,
                 isAdmin: false,
             }, {
@@ -77,7 +78,7 @@ class Storage {
                 registeredAt: '2002-01-01',
                 eMail: 'mailC@mail.su',
                 posts: 777,
-                location: 'bath',
+                location: 'burg',
                 isBanned: false,
                 isAdmin: false,
             }, {
@@ -87,7 +88,7 @@ class Storage {
                 registeredAt: '2003-01-01',
                 eMail: 'mailD@mail.su',
                 posts: 666,
-                location: 'kitchen',
+                location: 'sibirsk',
                 isBanned: true,
                 isAdmin: false,
             }
@@ -374,6 +375,11 @@ class Storage {
             return this.nextThreadId;
         }
         return false;
+    }
+
+    removeThread({id}) {
+        this.threads = this.threads.filter(thread => thread.id !== id);
+        return true;
     }
 
     addThreadViewCount(threadId) {

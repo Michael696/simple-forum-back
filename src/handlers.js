@@ -174,6 +174,19 @@ function removePost(req, res) {
     }
 }
 
+function removeThread(req, res) {
+    if (req.session && req.session.username) {
+        const result = storage.removeThread(req.body);
+        if (result) {
+            res.status(200).json({});
+        } else {
+            res.status(403).json({error: 'you are banned'});
+        }
+    } else {
+        res.status(401).json({error: 'unauthorized'});
+    }
+}
+
 function banUser(req, res) {
     if (req.session && req.session.username && req.body.id) {
         const user = storage.getUserByName(req.session.username);
@@ -221,4 +234,5 @@ module.exports = {
     unbanUser,
     setPostText,
     removePost,
+    removeThread
 };
