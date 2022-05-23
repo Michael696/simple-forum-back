@@ -66,7 +66,8 @@ class Storage {
                 eMail: 'mailB@mail.su',
                 posts: 888,
                 location: 'home',
-                isBanned: false
+                isBanned: false,
+                isAdmin: false,
             }, {
                 id: '03',
                 name: 'user3',
@@ -75,7 +76,8 @@ class Storage {
                 eMail: 'mailC@mail.su',
                 posts: 777,
                 location: 'bath',
-                isBanned: false
+                isBanned: false,
+                isAdmin: false,
             }, {
                 id: '04',
                 name: 'user4',
@@ -84,7 +86,8 @@ class Storage {
                 eMail: 'mailD@mail.su',
                 posts: 666,
                 location: 'kitchen',
-                isBanned: true
+                isBanned: true,
+                isAdmin: false,
             }
         ];
         this.nextUserId = 5;
@@ -237,9 +240,21 @@ class Storage {
             },
             {
                 id: 'p03',
+                threadId: 't01',
+                forumId: 'f01',
+                author: this.users[2],
+                title: 'post 3 title',
+                text: 'post 3 long text',
+                likes: [],
+                dislikes: [this.users[0]],
+                postedAt: '2022-04-05T16:18:19',
+                editedAt: '2022-04-05T17:20:21',
+            },
+            {
+                id: 'p04',
                 threadId: 't02',
                 forumId: 'f01',
-                author: this.users[0],
+                author: this.users[1],
                 title: 'post 3 title',
                 text: 'post 3 long text post 3 long text post 3 long text post 3 long text post 3 long text post 3 long text post 3 long text post 3 long text post 3 long text post 3 long text post 3 long text post 3 long text post 3 long text post 3 long text post 3 long text post 3 long text ',
                 likes: [],
@@ -248,7 +263,7 @@ class Storage {
                 editedAt: '2022-04-05T13:19:15',
             },
             {
-                id: 'p04',
+                id: 'p05',
                 threadId: 't02',
                 forumId: 'f01',
                 author: this.users[3],
