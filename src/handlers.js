@@ -174,6 +174,11 @@ function removePost(req, res) {
     }
 }
 
+function getPostCount(req, res) {
+    const count = storage.getPostCount(req.body);
+    res.status(200).json(count);
+}
+
 function removeThread(req, res) {
     if (req.session && req.session.username) {
         const result = storage.removeThread(req.body);
@@ -234,5 +239,6 @@ module.exports = {
     unbanUser,
     setPostText,
     removePost,
-    removeThread
+    removeThread,
+    getPostCount
 };

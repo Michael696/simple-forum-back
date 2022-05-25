@@ -420,6 +420,10 @@ class Storage {
         return true;
     }
 
+    getPostCount({id}) { // threadId
+        return this.posts.filter(post => post.threadId === id).length;
+    }
+
     addThread(thread) {
         const threadTemplate = getThreadTemplate();
         const author = this.users.find(user => user.id === thread.author);
