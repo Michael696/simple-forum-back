@@ -103,10 +103,10 @@ function forumThreads(req, res) {
 }
 
 function forumPosts(req, res) {
-    const id = req.body.id;
+    const {id, start, end} = req.body;
     if (id) {
         setTimeout(() => {
-            res.status(200).json(storage.getPosts(id));
+            res.status(200).json(storage.getPosts({id, start, end}));
         }, 1500);
     } else {
         res.status(400).end(`no such threadId ${id}`);

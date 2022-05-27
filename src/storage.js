@@ -357,8 +357,22 @@ class Storage {
         return this.forums;
     }
 
-    getPosts(threadId) {
-        return this.posts.filter(post => post.threadId === threadId);
+    getPosts({id, start, end}) { // threadId
+        const filtered = this.posts.filter(post => post.threadId === id);
+        const startInt = parseInt(start, 10);
+        const endInt = parseInt(end, 10);
+        if (!Number.isNaN(startInt) && !Number.isNaN(endInt)) {
+            console.log(`get post start=${startInt} end=${endInt}`);
+            const lim = (value, min, max) => value < min ? min : (value > max ? max : value);
+            const startOk = lim(startInt, 0, filtered.length - 1);
+            const endOk = lim(endInt, 0, filtered.length - 1);
+            return {
+                posts: filtered.filter((post, idx) => idx >= startOk && idx <= endOk),
+                start: startOk,
+                end: endOk
+            };
+        }
+        return filtered;
     }
 
     getOnlineUsers() {
@@ -421,7 +435,11 @@ class Storage {
     }
 
     getPostCount({id}) { // threadId
-        return this.posts.filter(post => post.threadId === id).length;
+        if (id) {
+            return this.posts.filter(post => post.threadId === id).length;
+        } else {
+            return 0;
+        }
     }
 
     addThread(thread) {
