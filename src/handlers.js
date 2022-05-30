@@ -4,7 +4,6 @@ const {Storage} = require('./storage');
 const storage = new Storage();
 
 function auth(req, res) {
-    console.log('auth body:', req.body);
     const {name: username, password} = req.body;
     const id = Auth.auth(req.session, {username, password});
     if (id) {
@@ -45,7 +44,7 @@ function deauth(req, res) {
 }
 
 function checkAuth(req, res, next) {
-    console.log(req);
+    console.log('check auth:', req);
     if (Auth.check(req.session)) {
         next();
     } else {
@@ -60,15 +59,15 @@ function register(req, res) {
     setTimeout(() => {
         if (body.name === 'a') {
             response = {name: 'testName', id: '01'};
-            console.log(response);
+            console.log('register resp:', response);
             res.status(200).json(response);
         } else if (body.name === 'b') {
             response = {error: 'name already used'};
-            console.log(response);
+            console.log('register resp:', response);
             res.status(200).json(response);
         } else if (body.name === 'c') {
             response = {error: 'email already used'};
-            console.log(response);
+            console.log('register resp:', response);
             res.status(200).json(response);
         } else {
             res.status(500).json({});
@@ -175,7 +174,9 @@ function removePost(req, res) {
 }
 
 function getPostCount(req, res) {
-    const count = storage.getPostCount(req.body);
+    const {id} = req.body;
+    const count = storage.getPostCount({id});
+    console.log(`getPostCount count for id=${id}`, count);
     res.status(200).json(count);
 }
 

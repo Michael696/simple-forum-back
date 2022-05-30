@@ -34,7 +34,6 @@ function getPostTemplate() {
         threadId: '',
         forumId: '',
         author: {},
-        title: '',
         text: '',
         likes: [],
         dislikes: [],
@@ -222,7 +221,6 @@ class Storage {
                 threadId: 't01',
                 forumId: 'f01',
                 author: this.users[2],
-                title: 'post 1 title',
                 text: 'post 1 long text',
                 likes: [this.users[1]],
                 dislikes: [],
@@ -234,7 +232,6 @@ class Storage {
                 threadId: 't01',
                 forumId: 'f01',
                 author: this.users[1],
-                title: 'post 2 title',
                 text: 'post 2 long text',
                 likes: [],
                 dislikes: [],
@@ -246,7 +243,6 @@ class Storage {
                 threadId: 't01',
                 forumId: 'f01',
                 author: this.users[2],
-                title: 'post 3 title',
                 text: 'post 3 long text',
                 likes: [],
                 dislikes: [this.users[0]],
@@ -258,7 +254,6 @@ class Storage {
                 threadId: 't01',
                 forumId: 'f01',
                 author: this.users[3],
-                title: 'post 4 title',
                 text: 'post 4 long text',
                 likes: [],
                 dislikes: [this.users[1]],
@@ -270,7 +265,6 @@ class Storage {
                 threadId: 't01',
                 forumId: 'f01',
                 author: this.users[3],
-                title: 'post 5 title',
                 text: 'post 5 long text',
                 likes: [],
                 dislikes: [this.users[1]],
@@ -282,7 +276,6 @@ class Storage {
                 threadId: 't01',
                 forumId: 'f01',
                 author: this.users[3],
-                title: 'post 6 title',
                 text: 'post 6 long text',
                 likes: [],
                 dislikes: [this.users[1]],
@@ -294,7 +287,6 @@ class Storage {
                 threadId: 't01',
                 forumId: 'f01',
                 author: this.users[3],
-                title: 'post 7 title',
                 text: 'post 7 long text',
                 likes: [],
                 dislikes: [this.users[1]],
@@ -306,7 +298,6 @@ class Storage {
                 threadId: 't01',
                 forumId: 'f01',
                 author: this.users[3],
-                title: 'post 8 title',
                 text: 'post 8 long text',
                 likes: [],
                 dislikes: [this.users[1]],
@@ -318,7 +309,6 @@ class Storage {
                 threadId: 't02',
                 forumId: 'f01',
                 author: this.users[1],
-                title: 'post 3 title',
                 text: 'post 3 long text post 3 long text post 3 long text post 3 long text post 3 long text post 3 long text post 3 long text post 3 long text post 3 long text post 3 long text post 3 long text post 3 long text post 3 long text post 3 long text post 3 long text post 3 long text ',
                 likes: [],
                 dislikes: [],
@@ -330,7 +320,6 @@ class Storage {
                 threadId: 't02',
                 forumId: 'f01',
                 author: this.users[3],
-                title: 'post 2 title',
                 text: 'post 2 long text',
                 likes: [],
                 dislikes: [],
@@ -397,12 +386,12 @@ class Storage {
         if (!author.isBanned) {
             const postTemplate = getPostTemplate();
             const postedAt = new Date().toISOString();
-            this.nextPostId++;
+            const postId = this.nextPostId++;
             const postData = {
                 ...postTemplate,
                 ...post,
                 author,
-                id: this.nextPostId.toString(),
+                id: postId.toString(),
                 postedAt
             };
             console.log('creating post:', postData);
@@ -415,7 +404,7 @@ class Storage {
                     user: author
                 }
             }
-            return this.nextPostId;
+            return postId;
         }
         return false;
     }
@@ -446,15 +435,15 @@ class Storage {
         const threadTemplate = getThreadTemplate();
         const author = this.users.find(user => user.id === thread.author);
         if (!author.isBanned) {
-            this.nextThreadId++;
+            const threadId = this.nextThreadId++;
             const threadData = {
                 ...threadTemplate,
                 ...thread,
                 author,
-                id: this.nextThreadId.toString()
+                id: threadId.toString()
             };
             this.threads.push(threadData);
-            return this.nextThreadId;
+            return threadId;
         }
         return false;
     }
