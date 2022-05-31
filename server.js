@@ -102,6 +102,7 @@ app.post('/api/add-post-dislike', [handlers.checkAuth, handlers.addPostDislike])
 app.post('/api/remove-thread', [handlers.checkAuth, handlers.removeThread]);
 app.post('/api/ban-user', [handlers.checkAuth, handlers.banUser]);
 app.post('/api/unban-user', [handlers.checkAuth, handlers.unbanUser]);
+app.post('/api/get-banned', [handlers.checkAuth, handlers.getBanned]);
 
 let server = app.listen(1337, function () {
     let msg = `Express server is listening on ${JSON.stringify(server.address())}`;

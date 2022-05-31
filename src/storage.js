@@ -350,6 +350,16 @@ class Storage {
         const filtered = this.posts.filter(post => post.threadId === id);
         const startInt = parseInt(start, 10);
         const endInt = parseInt(end, 10);
+
+        // TODO test for edge cases
+        if (startInt > filtered.length || endInt > filtered.length) {
+            return {
+                posts: [],
+                start: -1,
+                end: -1
+            };
+        }
+
         if (!Number.isNaN(startInt) && !Number.isNaN(endInt)) {
             console.log(`get post start=${startInt} end=${endInt}`);
             const lim = (value, min, max) => value < min ? min : (value > max ? max : value);
@@ -521,7 +531,13 @@ class Storage {
         return false;
     }
 
-}
+    isAdmin(userName) {
+        return ~this.users.findIndex(user => user.name === userName && user.isAdmin);
+    }
 
+    getBanned() {  // TODO think about authorization
+        return this.users.filter(user => user.isBanned).map(user => user.id);
+    }
+}
 
 module.exports = {Storage};

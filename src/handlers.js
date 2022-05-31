@@ -225,10 +225,8 @@ function removeThread(req, res) {
 
 function banUser(req, res) {
     if (req.session && req.session.username && req.body.id) {
-        const user = storage.getUserByName(req.session.username);
-        if (user.isAdmin) {
+        if (storage.isAdmin(req.session.username)) {
             storage.banUser(req.body.id);
-            console.log('banned user:', user);
             res.status(200).json({});
         } else {
             res.status(403).json({error: 'you are not an admin'});
@@ -240,11 +238,22 @@ function banUser(req, res) {
 
 function unbanUser(req, res) {
     if (req.session && req.session.username && req.body.id) {
-        const user = storage.getUserByName(req.session.username);
-        if (user.isAdmin) {
+        if (storage.isAdmin(req.session.username)) {
             storage.unbanUser(req.body.id);
-            console.log('unbanned user:', user);
             res.status(200).json({});
+        } else {
+            res.status(403).json({error: 'you are not an admin'});
+        }
+    } else {
+        res.status(401).json({error: 'unauthorized'});
+    }
+}
+
+function getBanned(req, res) {
+    if (req.session && req.session.username) {
+        if (storage.isAdmin(req.session.username)) {
+            const result = storage.getBanned();
+            res.status(200).json(result);
         } else {
             res.status(403).json({error: 'you are not an admin'});
         }
@@ -268,6 +277,7 @@ module.exports = {
     createPost,
     banUser,
     unbanUser,
+    getBanned,
     setPostText,
     removePost,
     removeThread,
