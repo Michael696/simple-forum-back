@@ -173,6 +173,36 @@ function removePost(req, res) {
     }
 }
 
+function addPostLike(req, res) {
+    if (req.session && req.session.username) {
+        const postId = req.body.postId;
+        const userId = req.body.userId;
+        const result = storage.addLike(postId, userId);
+        if (result) {
+            res.status(200).json({});
+        } else {
+            res.status(403).json({error: 'you are banned'});
+        }
+    } else {
+        res.status(401).json({error: 'unauthorized'});
+    }
+}
+
+function addPostDislike(req, res) {
+    if (req.session && req.session.username) {
+        const postId = req.body.postId;
+        const userId = req.body.userId;
+        const result = storage.addDislike(postId, userId);
+        if (result) {
+            res.status(200).json({});
+        } else {
+            res.status(403).json({error: 'you are banned'});
+        }
+    } else {
+        res.status(401).json({error: 'unauthorized'});
+    }
+}
+
 function getPostCount(req, res) {
     const {id} = req.body;
     const count = storage.getPostCount({id});
@@ -241,5 +271,7 @@ module.exports = {
     setPostText,
     removePost,
     removeThread,
-    getPostCount
+    getPostCount,
+    addPostLike,
+    addPostDislike
 };

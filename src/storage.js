@@ -471,6 +471,38 @@ class Storage {
         return false;
     }
 
+    addLike(postId, userId) { // TODO refactor duplicate code (addLike/addDislike)
+        const post = this.posts.find(post => post.id === postId);
+        if (post) {
+            const noLikesFromUser = !post.likes.some(like => like.id === userId);
+            if (noLikesFromUser) {
+                const user = this.users.find(user => user.id === userId);
+                if (user) {
+                    post.dislikes = post.dislikes.filter(like => like.id !== userId); // remove dislike
+                    post.likes.push(user);
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
+    addDislike(postId, userId) { // TODO refactor duplicate code (addLike/addDislike)
+        const post = this.posts.find(post => post.id === postId);
+        if (post) {
+            const noDislikesFromUser = !post.dislikes.some(like => like.id === userId);
+            if (noDislikesFromUser) {
+                const user = this.users.find(user => user.id === userId);
+                if (user) {
+                    post.likes = post.likes.filter(like => like.id !== userId); // remove like
+                    post.dislikes.push(user);
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
     banUser(userId) {
         const user = this.users.find(user => user.id === userId);
         if (user) {

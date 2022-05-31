@@ -97,6 +97,8 @@ app.post('/api/create-thread', [handlers.checkAuth, handlers.createThread]);
 app.post('/api/create-post', [handlers.checkAuth, handlers.createPost]);
 app.post('/api/set-post-text', [handlers.checkAuth, handlers.setPostText]);
 app.post('/api/remove-post', [handlers.checkAuth, handlers.removePost]);
+app.post('/api/add-post-like', [handlers.checkAuth, handlers.addPostLike]);
+app.post('/api/add-post-dislike', [handlers.checkAuth, handlers.addPostDislike]);
 app.post('/api/remove-thread', [handlers.checkAuth, handlers.removeThread]);
 app.post('/api/ban-user', [handlers.checkAuth, handlers.banUser]);
 app.post('/api/unban-user', [handlers.checkAuth, handlers.unbanUser]);
