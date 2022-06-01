@@ -92,7 +92,7 @@ app.post('/api/forum-list', handlers.forumList);
 app.post('/api/threads', handlers.forumThreads);
 app.post('/api/posts', handlers.forumPosts);
 app.post('/api/get-post-count', handlers.getPostCount);
-app.post('/api/add-threadViewCount', handlers.addThreadViewCount);
+app.post('/api/add-thread-view-count', handlers.addThreadViewCount);
 app.post('/api/create-thread', [handlers.checkAuth, handlers.createThread]);
 app.post('/api/create-post', [handlers.checkAuth, handlers.createPost]);
 app.post('/api/set-post-text', [handlers.checkAuth, handlers.setPostText]);

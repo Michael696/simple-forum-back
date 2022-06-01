@@ -44,7 +44,6 @@ function deauth(req, res) {
 }
 
 function checkAuth(req, res, next) {
-    console.log('check auth:', req);
     if (Auth.check(req.session)) {
         next();
     } else {
@@ -173,34 +172,40 @@ function removePost(req, res) {
     }
 }
 
-function addPostLike(req, res) {
-    if (req.session && req.session.username) {
-        const postId = req.body.postId;
-        const userId = req.body.userId;
-        const result = storage.addLike(postId, userId);
-        if (result) {
-            res.status(200).json({});
+function likeDislikeHandler(actionFunction) {
+    return function (req, res) {
+        if (req.session && req.session.username) {
+            const postId = req.body.id;
+            const user = storage.getUserByName(req.session.username);
+            if (user) {
+                const post = storage.getPostById(postId);
+                if (post) {
+                    const result = actionFunction(postId, user.id);
+                    if (result) {
+                        res.status(200).json({});
+                    } else {
+                        res.status(403).json({error: 'already has like/dislike'});
+                    }
+                } else {
+                    res.status(400).json({error: 'post not found'});
+                }
+            } else { // is it possible ?
+                res.status(401).json({error: 'unauthorized'});
+            }
         } else {
-            res.status(403).json({error: 'you are banned'});
+            res.status(401).json({error: 'unauthorized'});
         }
-    } else {
-        res.status(401).json({error: 'unauthorized'});
     }
 }
 
+function addPostLike(req, res) {
+    const handler = likeDislikeHandler(storage.addLike.bind(storage));
+    handler(req, res);
+}
+
 function addPostDislike(req, res) {
-    if (req.session && req.session.username) {
-        const postId = req.body.postId;
-        const userId = req.body.userId;
-        const result = storage.addDislike(postId, userId);
-        if (result) {
-            res.status(200).json({});
-        } else {
-            res.status(403).json({error: 'you are banned'});
-        }
-    } else {
-        res.status(401).json({error: 'unauthorized'});
-    }
+    const handler = likeDislikeHandler(storage.addDislike.bind(storage));
+    handler(req, res);
 }
 
 function getPostCount(req, res) {
@@ -212,11 +217,20 @@ function getPostCount(req, res) {
 
 function removeThread(req, res) {
     if (req.session && req.session.username) {
-        const result = storage.removeThread(req.body);
-        if (result) {
-            res.status(200).json({});
+        const thread = storage.getThreadById(req.body.id);
+        if (thread) {
+            if (thread.author.name === req.session.username) {
+                if (thread.author.isBanned) {
+                    res.status(403).json({error: 'you are banned'});
+                } else {
+                    storage.removeThread(req.body.id);
+                    res.status(200).json({});
+                }
+            } else {
+                res.status(401).json({error: 'unauthorized'});
+            }
         } else {
-            res.status(403).json({error: 'you are banned'});
+            res.status(400).json({error: 'thread not found'});
         }
     } else {
         res.status(401).json({error: 'unauthorized'});

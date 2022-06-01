@@ -342,6 +342,10 @@ class Storage {
         return this.threads.filter(thread => thread.forumId === forumId);
     }
 
+    getThreadById(threadId) {
+        return this.threads.find(thread => thread.id === threadId);
+    }
+
     getForums() {
         return this.forums;
     }
@@ -352,7 +356,7 @@ class Storage {
         const endInt = parseInt(end, 10);
 
         // TODO test for edge cases
-        if (startInt > filtered.length || endInt > filtered.length) {
+        if (startInt > filtered.length && endInt > filtered.length) {
             return {
                 posts: [],
                 start: -1,
@@ -372,6 +376,10 @@ class Storage {
             };
         }
         return filtered;
+    }
+
+    getPostById(postId) {
+        return this.posts.find(post => post.id === postId);
     }
 
     getOnlineUsers() {
@@ -458,7 +466,7 @@ class Storage {
         return false;
     }
 
-    removeThread({id}) {
+    removeThread(id) {
         this.threads = this.threads.filter(thread => thread.id !== id);
         return true;
     }
