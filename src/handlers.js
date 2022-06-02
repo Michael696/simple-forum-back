@@ -264,8 +264,9 @@ function removeThread(req, res) {
         const threadId = req.body.id;
         if (threadId) {
             const thread = storage.getThreadById(threadId);
+            const isAdmin = storage.isAdmin(req.session.username);
             if (thread) {
-                if (thread.author.name === req.session.username) {
+                if (thread.author.name === req.session.username || isAdmin) {
                     if (thread.author.isBanned) {
                         res.status(403).json({error: 'you are banned'});
                     } else {
