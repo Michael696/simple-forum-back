@@ -436,7 +436,7 @@ class Storage {
         return false;
     }
 
-    removePost({id}) { // TODO set the "removed" flag, do not actually remove
+    removePost(id) { // TODO set the "removed" flag, do not actually remove
         this.posts = this.posts.filter(post => post.id !== id);
         return true;
     }
@@ -543,7 +543,7 @@ class Storage {
         return ~this.users.findIndex(user => user.name === userName && user.isAdmin);
     }
 
-    getBanned() {  // TODO think about authorization
+    getBanned() {
         return this.users.filter(user => user.isBanned).map(user => user.id);
     }
 }

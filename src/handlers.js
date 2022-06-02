@@ -5,22 +5,25 @@ const storage = new Storage();
 
 function auth(req, res) {
     const {name: username, password} = req.body;
-    const id = Auth.auth(req.session, {username, password});
-    if (id) {
-        const user = storage.getUserByName(username);
-        if (user) {
-            storage.addOnlineUser(user.id);
-            res.status(200).json(user);
+    if (username && password) {
+        const id = Auth.auth(req.session, {username, password});
+        if (id) {
+            const user = storage.getUserByName(username);
+            if (user) {
+                storage.addOnlineUser(user.id); // TODO build onlineUsers after start from active sessions
+                res.status(200).json(user);
+            } else {
+                res.status(401).json({error: 'user not found'});
+            }
         } else {
-            res.status(401).json({error: 'user not found'});
+            res.status(401).json({error: 'unknown credentials'});
         }
     } else {
-        res.status(401).json({error: 'unknown credentials'});
+        res.status(400).json({error: 'invalid request'});
     }
 }
 
 function currentUser(req, res) {
-    console.log('currentUser:', req.body);
     if (req.session && req.session.username) {
         const user = storage.getUserByName(req.session.username);
         if (user) {
@@ -34,7 +37,6 @@ function currentUser(req, res) {
 }
 
 function deauth(req, res) {
-    console.log('deauth:', req.body);
     const user = storage.getUserByName(req.session.username);
     if (user) {
         storage.removeOnlineUser(user.id);
@@ -51,7 +53,7 @@ function checkAuth(req, res, next) {
     }
 }
 
-function register(req, res) {
+function register(req, res) { // TODO make it real
     const {body} = req;
     console.log('register:', body);
     let response;
@@ -86,47 +88,69 @@ function onlineUsers(req, res) {
 function forumList(req, res) {
     setTimeout(() => {
         res.status(200).json(storage.getForums());
-    }, 1000);
+    }, 500);
 }
 
 function forumThreads(req, res) {
-    const id = req.body.id;
+    const {id} = req.body;
     if (id) {
         setTimeout(() => {
             res.status(200).json(storage.getThreads(id));
-        }, 1500);
+        }, 500);
     } else {
         res.status(400).end(`no such forumId ${id}`);
     }
 }
 
+/**
+ * Copies specified fields from one object to another new object. If at least one field does not exists, returns "false"
+ * @param obj source object
+ * @param fields fields to pick
+ */
+function objectPick(obj, fields) { // TODO unit tests
+    let picked = {};
+    return fields.every(field => {
+        if (typeof obj[field] === 'undefined' || obj[field] === null) {
+            return false;
+        } else {
+            picked[field] = obj[field];
+            return true;
+        }
+    }) && picked;
+}
+
 function forumPosts(req, res) {
-    const {id, start, end} = req.body;
-    if (id) {
+    const params = objectPick(req.body, ['id', 'start', 'end']);
+    if (params) {
         setTimeout(() => {
-            res.status(200).json(storage.getPosts({id, start, end}));
-        }, 1500);
+            res.status(200).json(storage.getPosts(params));
+        }, 500);
     } else {
-        res.status(400).end(`no such threadId ${id}`);
+        res.status(400).end(`invalid request`);
     }
 }
 
 function addThreadViewCount(req, res) {
-    const id = req.body.id;
+    const {id} = req.body;
     if (id) {
         res.status(200).json(storage.addThreadViewCount(id));
     } else {
-        res.status(400).end(`no such threadId ${id}`);
+        res.status(400).end(`invalid request`);
     }
 }
 
 function createThread(req, res) {
     if (req.session && req.session.username) {
-        const id = storage.addThread(req.body);
-        if (id) {
-            res.status(200).json({id});
+        const thread = objectPick(req.body, ['forumId', 'author', 'title']);
+        if (thread) {
+            const id = storage.addThread(thread);
+            if (id) {
+                res.status(200).json({id});
+            } else {
+                res.status(403).json({error: 'you are banned'});
+            }
         } else {
-            res.status(403).json({error: 'you are banned'});
+            res.status(400).json({error: 'invalid request'});
         }
     } else {
         res.status(401).json({error: 'unauthorized'});
@@ -135,11 +159,17 @@ function createThread(req, res) {
 
 function createPost(req, res) {
     if (req.session && req.session.username) {
-        const id = storage.addPost(req.body);
-        if (id) {
-            res.status(200).json({id});
+        const post = objectPick(req.body, ['author', 'text', 'forumId', 'threadId']);
+        console.log('post:', post);
+        if (post) {
+            const id = storage.addPost(post);
+            if (id) {
+                res.status(200).json({id});
+            } else {
+                res.status(403).json({error: 'you are banned'});
+            }
         } else {
-            res.status(403).json({error: 'you are banned'});
+            res.status(400).json({error: 'invalid request'});
         }
     } else {
         res.status(401).json({error: 'unauthorized'});
@@ -148,11 +178,16 @@ function createPost(req, res) {
 
 function setPostText(req, res) {
     if (req.session && req.session.username) {
-        const result = storage.setPostText(req.body);
-        if (result) {
-            res.status(200).json({});
+        const post = objectPick(req.body, ['id', 'text']);
+        if (post) {
+            const result = storage.setPostText(post);
+            if (result) {
+                res.status(200).json({});
+            } else {
+                res.status(403).json({error: 'you are banned'});
+            }
         } else {
-            res.status(403).json({error: 'you are banned'});
+            res.status(400).json({error: 'invalid request'});
         }
     } else {
         res.status(401).json({error: 'unauthorized'});
@@ -161,11 +196,16 @@ function setPostText(req, res) {
 
 function removePost(req, res) {
     if (req.session && req.session.username) {
-        const result = storage.removePost(req.body);
-        if (result) {
-            res.status(200).json({});
+        const id = req.body.id;
+        if (id) {
+            const result = storage.removePost(id);
+            if (result) {
+                res.status(200).json({});
+            } else {
+                res.status(403).json({error: 'you are banned'});
+            }
         } else {
-            res.status(403).json({error: 'you are banned'});
+            res.status(400).json({error: 'invalid request'});
         }
     } else {
         res.status(401).json({error: 'unauthorized'});
@@ -175,19 +215,23 @@ function removePost(req, res) {
 function likeDislikeHandler(actionFunction) {
     return function (req, res) {
         if (req.session && req.session.username) {
-            const postId = req.body.id;
             const user = storage.getUserByName(req.session.username);
             if (user) {
-                const post = storage.getPostById(postId);
-                if (post) {
-                    const result = actionFunction(postId, user.id);
-                    if (result) {
-                        res.status(200).json({});
+                const postId = req.body.id;
+                if (postId) {
+                    const post = storage.getPostById(postId);
+                    if (post) {
+                        const result = actionFunction(postId, user.id);
+                        if (result) {
+                            res.status(200).json({});
+                        } else {
+                            res.status(403).json({error: `post '${postId}' already has like/dislike`});
+                        }
                     } else {
-                        res.status(403).json({error: 'already has like/dislike'});
+                        res.status(400).json({error: `post '${postId}' not found`});
                     }
                 } else {
-                    res.status(400).json({error: 'post not found'});
+                    res.status(400).json({error: 'invalid request'});
                 }
             } else { // is it possible ?
                 res.status(401).json({error: 'unauthorized'});
@@ -217,20 +261,25 @@ function getPostCount(req, res) {
 
 function removeThread(req, res) {
     if (req.session && req.session.username) {
-        const thread = storage.getThreadById(req.body.id);
-        if (thread) {
-            if (thread.author.name === req.session.username) {
-                if (thread.author.isBanned) {
-                    res.status(403).json({error: 'you are banned'});
+        const threadId = req.body.id;
+        if (threadId) {
+            const thread = storage.getThreadById(threadId);
+            if (thread) {
+                if (thread.author.name === req.session.username) {
+                    if (thread.author.isBanned) {
+                        res.status(403).json({error: 'you are banned'});
+                    } else {
+                        storage.removeThread(threadId);
+                        res.status(200).json({});
+                    }
                 } else {
-                    storage.removeThread(req.body.id);
-                    res.status(200).json({});
+                    res.status(401).json({error: `you are not the author of the thread '${threadId}'`});
                 }
             } else {
-                res.status(401).json({error: 'unauthorized'});
+                res.status(400).json({error: 'thread not found'});
             }
         } else {
-            res.status(400).json({error: 'thread not found'});
+            res.status(400).json({error: 'invalid request'});
         }
     } else {
         res.status(401).json({error: 'unauthorized'});
@@ -238,12 +287,17 @@ function removeThread(req, res) {
 }
 
 function banUser(req, res) {
-    if (req.session && req.session.username && req.body.id) {
-        if (storage.isAdmin(req.session.username)) {
-            storage.banUser(req.body.id);
-            res.status(200).json({});
+    if (req.session && req.session.username) {
+        const {id: userId} = req.body;
+        if (userId) {
+            if (storage.isAdmin(req.session.username)) {
+                storage.banUser(userId);
+                res.status(200).json({});
+            } else {
+                res.status(403).json({error: 'you are not an admin'});
+            }
         } else {
-            res.status(403).json({error: 'you are not an admin'});
+            res.status(400).json({error: 'invalid request'});
         }
     } else {
         res.status(401).json({error: 'unauthorized'});
@@ -252,11 +306,16 @@ function banUser(req, res) {
 
 function unbanUser(req, res) {
     if (req.session && req.session.username && req.body.id) {
-        if (storage.isAdmin(req.session.username)) {
-            storage.unbanUser(req.body.id);
-            res.status(200).json({});
+        const {id: userId} = req.body;
+        if (userId) {
+            if (storage.isAdmin(req.session.username)) {
+                storage.unbanUser(userId);
+                res.status(200).json({});
+            } else {
+                res.status(403).json({error: 'you are not an admin'});
+            }
         } else {
-            res.status(403).json({error: 'you are not an admin'});
+            res.status(401).json({error: 'invalid request'});
         }
     } else {
         res.status(401).json({error: 'unauthorized'});

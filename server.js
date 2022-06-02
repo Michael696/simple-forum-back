@@ -4,8 +4,8 @@ const loggerHttp = require('morgan');
 const bodyParser = require('body-parser');
 const cors = require('cors');
 const session = require('express-session');
-// const FileStore = require('session-file-store')(session);
-const MemoryStore = require('memorystore')(session);
+const FileStore = require('session-file-store')(session);
+// const MemoryStore = require('memorystore')(session);
 const app = express();
 const handlers = require('./src/handlers');
 
@@ -47,8 +47,8 @@ app.use(session({
         maxAge: 86400000,
         sameSite: 'None',
     },
-    store: new MemoryStore({
-        checkPeriod: 86400000 // prune expired entries every 24h
+    store: new FileStore({
+        ttl: 24 * 3600
     }),
     rolling: true,
     resave: false, // don't save session if unmodified
