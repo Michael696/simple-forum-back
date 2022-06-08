@@ -1,20 +1,13 @@
 class Auth extends Object {
-    static auth(session, {username, password}) {
+    static auth({session, storage, username, password}) {
         if (session) {
-            if (password === 'a') {
-                session.authenticated = true;
-                session.username = username;
-                return '01'; // id
-            }
-            if (password === 'b') {
-                session.authenticated = true;
-                session.username = username;
-                return '02'; // id
-            }
-            if (password === 'd') {
-                session.authenticated = true;
-                session.username = username;
-                return '04'; // id
+            const user = storage.getUserByName(username);
+            if (user) {
+                if (user.password === password) {
+                    session.authenticated = true;
+                    session.username = username;
+                    return user;
+                }
             }
         }
         return false;

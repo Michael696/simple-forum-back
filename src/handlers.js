@@ -1,3 +1,4 @@
+const {objectPick} = require('./helpers');
 const {Auth} = require('./auth');
 const {Storage} = require('./storage');
 
@@ -6,15 +7,10 @@ const storage = new Storage();
 function auth(req, res) {
     const {name: username, password} = req.body;
     if (username && password) {
-        const id = Auth.auth(req.session, {username, password});
-        if (id) {
-            const user = storage.getUserByName(username);
-            if (user) {
-                storage.addOnlineUser(user.id); // TODO build onlineUsers after start from active sessions
-                res.status(200).json(user);
-            } else {
-                res.status(401).json({error: 'user not found'});
-            }
+        const user = Auth.auth({session: req.session, storage, username, password});
+        if (user) {
+            storage.addOnlineUser(user.id); // TODO build onlineUsers after start from active sessions
+            res.status(200).json(user);
         } else {
             res.status(401).json({error: 'unknown credentials'});
         }
@@ -54,26 +50,23 @@ function checkAuth(req, res, next) {
 }
 
 function register(req, res) { // TODO make it real
-    const {body} = req;
-    console.log('register:', body);
-    let response;
-    setTimeout(() => {
-        if (body.name === 'a') {
-            response = {name: 'testName', id: '01'};
-            console.log('register resp:', response);
-            res.status(200).json(response);
-        } else if (body.name === 'b') {
-            response = {error: 'name already used'};
-            console.log('register resp:', response);
-            res.status(200).json(response);
-        } else if (body.name === 'c') {
-            response = {error: 'email already used'};
-            console.log('register resp:', response);
-            res.status(200).json(response);
-        } else {
-            res.status(500).json({});
-        }
-    }, 2000);
+    if (req.session && req.session.name) {
+        res.status(403).json({error: 'authenticated user cannot sign-up'});
+    } else {
+        setTimeout(() => {
+            const newUser = objectPick(req.body, ['name', 'realName', 'location', 'eMail', 'password']);
+            if (newUser) {
+                const result = storage.registerUser(newUser);
+                if (result && result.error.length === 0) {
+                    res.status(200).json({});
+                } else {
+                    res.status(400).json({error: result.error});
+                }
+            } else {
+                res.status(400).json({error: 'required parameter missing'});
+            }
+        }, 1000);
+    }
 }
 
 function onlineUsers(req, res) {
@@ -100,23 +93,6 @@ function forumThreads(req, res) {
     } else {
         res.status(400).end(`no such forumId ${id}`);
     }
-}
-
-/**
- * Copies specified fields from one object to another new object. If at least one field does not exists, returns "false"
- * @param obj source object
- * @param fields fields to pick
- */
-function objectPick(obj, fields) { // TODO unit tests
-    let picked = {};
-    return fields.every(field => {
-        if (typeof obj[field] === 'undefined' || obj[field] === null) {
-            return false;
-        } else {
-            picked[field] = obj[field];
-            return true;
-        }
-    }) && picked;
 }
 
 function forumPosts(req, res) {

@@ -3,12 +3,13 @@ function getUserTemplate() {
         id: '',
         name: '',
         realName: '',
-        registeredAt: '',
+        registeredAt: new Date().toISOString(), // TODO format date strings
         eMail: '',
         posts: 0,
         location: '',
         isBanned: false,
-        isAdmin: false
+        isAdmin: false,
+        password: '', // TODO do not store passwords in plain text
     }
 }
 
@@ -59,7 +60,8 @@ class Storage {
                 posts: 9999,
                 location: 'moscow',
                 isBanned: false,
-                isAdmin: true
+                isAdmin: true,
+                password: 'a',
             }, {
                 id: '02',
                 name: 'user2',
@@ -70,6 +72,7 @@ class Storage {
                 location: 'peter',
                 isBanned: false,
                 isAdmin: false,
+                password: 'b',
             }, {
                 id: '03',
                 name: 'user3',
@@ -80,6 +83,7 @@ class Storage {
                 location: 'burg',
                 isBanned: false,
                 isAdmin: false,
+                password: 'c',
             }, {
                 id: '04',
                 name: 'user4',
@@ -90,6 +94,7 @@ class Storage {
                 location: 'sibirsk',
                 isBanned: true,
                 isAdmin: false,
+                password: 'd',
             }
         ];
         this.nextUserId = 5;
@@ -330,8 +335,29 @@ class Storage {
         this.nextPostId = 5;
     }
 
-    registerUser(username, password, eMail) {
-
+    registerUser({name, realName, location, password, eMail}) {
+        const sameName = this.users.some(user => user.name === name);
+        const sameEmail = this.users.some(user => user.eMail === eMail);
+        if (!sameName && !sameEmail) {
+            const user = {
+                ...getUserTemplate(),
+                id: (this.nextUserId++).toString(),
+                name,
+                realName,
+                location,
+                eMail,
+                password
+            };
+            this.users.push(user);
+            return {error: ''};
+        } else {
+            if (sameName) {
+                return {error: 'this name is already used'}
+            }
+            if (sameEmail) {
+                return {error: 'this e-mail is already used'}
+            }
+        }
     }
 
     getUserByName(name) {
