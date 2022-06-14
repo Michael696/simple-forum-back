@@ -382,7 +382,7 @@ class Storage {
         const endInt = parseInt(end, 10);
 
         // TODO test for edge cases
-        if (startInt > filtered.length && endInt > filtered.length) {
+        if (startInt >= filtered.length && endInt >= filtered.length) {
             return {
                 posts: [],
                 start: -1,
@@ -394,14 +394,18 @@ class Storage {
             console.log(`get post start=${startInt} end=${endInt}`);
             const lim = (value, min, max) => value < min ? min : (value > max ? max : value);
             const startOk = lim(startInt, 0, filtered.length - 1);
-            const endOk = lim(endInt, 0, filtered.length - 1);
+            const endOk = lim(endInt, startOk, filtered.length - 1);
             return {
                 posts: filtered.filter((post, idx) => idx >= startOk && idx <= endOk),
                 start: startOk,
                 end: endOk
             };
         }
-        return filtered;
+        return {
+            posts: filtered,
+            start: 0,
+            end: filtered.length - 1
+        };
     }
 
     getPostById(postId) {

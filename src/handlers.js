@@ -109,7 +109,12 @@ function forumPosts(req, res) {
 function addThreadViewCount(req, res) {
     const {id} = req.body;
     if (id) {
-        res.status(200).json(storage.addThreadViewCount(id));
+        const result = storage.addThreadViewCount(id);
+        if (result) {
+            res.status(200).json({});
+        } else {
+            res.status(400).json('no such thread');
+        }
     } else {
         res.status(400).end(`invalid request`);
     }
